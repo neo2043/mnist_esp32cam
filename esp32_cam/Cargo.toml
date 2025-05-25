@@ -1,0 +1,54 @@
+[package]
+name = "esp32_cam"
+version = "0.1.0"
+authors = ["auto"]
+edition = "2021"
+resolver = "2"
+rust-version = "1.77"
+
+[[bin]]
+name = "esp32_cam"
+harness = false # do not use the built in cargo test harness -> resolve rust-analyzer errors
+
+[features]
+default = ["std", "embassy", "esp-idf-svc/native"]
+
+pio = ["esp-idf-svc/pio"]
+std = ["alloc", "esp-idf-svc/binstart", "esp-idf-svc/std"]
+alloc = ["esp-idf-svc/alloc"]
+nightly = ["esp-idf-svc/nightly"]
+experimental = ["esp-idf-svc/experimental"]
+embassy = ["esp-idf-svc/embassy-sync", "esp-idf-svc/critical-section", "esp-idf-svc/embassy-time-driver"]
+
+[dependencies]
+log = "0.4"
+esp-idf-svc = { version = "0.51", features = ["critical-section", "embassy-time-driver", "embassy-sync"] }
+embedded-svc = "0.28"
+anyhow = "1.0.79"
+esp-idf-hal = "0.45.2"
+esp-idf-sys = "0.36.1"
+thiserror = "2.0.12"
+
+# [profile.release]
+# opt-level = "s"
+
+[profile.dev]
+debug = true
+opt-level = "z"
+
+[profile.release]
+codegen-units    = 1
+debug            = 2
+debug-assertions = true
+incremental      = false
+opt-level        = 3
+lto = 'fat'
+overflow-checks  = false
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = "components/esp32-camera"
+bindings_header = "components/bindings.h"
+bindings_module = "camera"
+
+[build-dependencies]
+embuild = "0.33"
